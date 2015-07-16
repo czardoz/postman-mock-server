@@ -29,7 +29,7 @@ def setup_logging(args):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description= """PostMocker
+    parser = argparse.ArgumentParser(description="""PostMocker
         will take a collection file where the responses are saved, and serve
         those up at the appropriate routes!
     """)
