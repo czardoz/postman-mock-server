@@ -16,5 +16,5 @@ setup(
     test_suite='nose.collector',
     long_description=open('README.rst').read(),
     tests_require=['nose'],
-    scripts=['bin/pmock']
+    scripts=['bin/postmocker']
 )
