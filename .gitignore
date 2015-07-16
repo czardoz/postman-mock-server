@@ -1,0 +1,19 @@
+*.py[co]
+.idea/
+*.iml
+
+# Packages
+*.egg
+*.egg-info
+.eggs/
+dist
+build
+eggs
+parts
+sdist
+develop-eggs
+.installed.cfg
+
+# Installer logs
+pip-log.txt
+.coverage
