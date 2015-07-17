@@ -1,14 +1,14 @@
+import json
 import logging
 import re
 import urlparse
 
-from flask import Flask, request
+from flask import Flask
 
 logger = logging.getLogger(__name__)
 
-app = Flask(__name__)
-
 BLACKLISTED_HEADERS = [
+    # These are blacklisted because they relate to the mode of transport.
     'content-length',
     'transfer-encoding',
     'content-encoding'
@@ -34,7 +34,11 @@ class Route(object):
         if req['dataMode'] == 'urlencoded' or req['dataMode'] == 'params':
             self.request_body_args = dict([(arg['key'], arg['value']) for arg in req['data']])
         else:
-            self.request_body_args = []
+            try:
+                self.request_body_args = json.loads(req['rawModeData'])
+            except ValueError:
+                # The raw request body is not something we can process. Store it, but do nothing with it.
+                self.request_body_args = req['rawModeData']
 
         # Method
         self.request_method = req['method']
@@ -68,11 +72,12 @@ class Route(object):
 
 class AppBuilder(object):
     def __init__(self, collection):
+        self.app = Flask(__name__)
         self.collection = collection
-        self._valid_routes = self._get_valid_routes()
+        self._valid_routes = self.get_valid_routes()
         logger.debug('Creating a WSGI app for collection: %s', collection['name'])
 
-    def _get_valid_routes(self):
+    def get_valid_routes(self):
         routes = []
         for req in self.collection['requests']:
             if req['responses']:
@@ -83,5 +88,5 @@ class AppBuilder(object):
 
     def build_app(self):
         for route in self._valid_routes:
-            app.add_url_rule(route.request_path, route.name, route, methods=[route.request_method])
-        return app
+            self.app.add_url_rule(route.request_path, route.name, route, methods=[route.request_method])
+        return self.app

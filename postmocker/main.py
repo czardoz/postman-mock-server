@@ -24,9 +24,11 @@ class PostMocker(object):
         self.server = None
         self.port = port
         self.builder = AppBuilder(collection)
+        self.app = None
 
     def start(self):
-        self.server = WSGIServer(('', self.port), self.builder.build_app(), handler_class=LoggingWSGIHandler)
+        self.app = self.builder.build_app()
+        self.server = WSGIServer(('', self.port), self.app, handler_class=LoggingWSGIHandler)
         self.server_greenlet = gevent.spawn(self.server.serve_forever)
 
         while self.server.server_port == 0:
